@@ -72,11 +72,8 @@ namespace DogGo.Repositories
                 {
                     cmd.CommandText = @"
                         SELECT o.Id as oId, o.Email, o.[Name] as oName, o.Address, o.NeighborhoodId, o.Phone,
-                        n.Id as nId, n.[Name] as nName,
-                        d.id as dId, d.[Name] as dName, d.ImageUrl
+                        n.Id as nId, n.[Name] as nName
                         FROM Owner o
-                        JOIN Dog d
-                        ON d.OwnerId = o.id
                         JOIN Neighborhood n
                         ON n.id = o.NeighborhoodId
                         WHERE o.Id = @id
@@ -103,16 +100,22 @@ namespace DogGo.Repositories
                             },
                             Doggo = new List<Doggo>()
                         };
-                         
-                            var dogId = reader.GetInt32(reader.GetOrdinal("dId"));
-                            var existingDog = owner.Doggo.FirstOrDefault(d => d.Id == dogId);
-                            owner.Doggo.Add(new Doggo()
-                            {
-                                Id = dogId,
-                                Name = reader.GetString(reader.GetOrdinal("dName"))
-                            });
-                        
                         reader.Close();
+                        cmd.CommandText = @"SELECT Id, Name FROM Dog WHERE OwnerId = @dId";
+                        cmd.Parameters.AddWithValue("@dId", id);
+                        SqlDataReader reader1 = cmd.ExecuteReader();
+                            
+                         while(reader1.Read())
+                            {
+                                owner.Doggo.Add(new Doggo()
+                                {
+                                    Id = reader1.GetInt32(reader1.GetOrdinal("Id")),
+                                    Name = reader1.GetString(reader1.GetOrdinal("Name"))
+                                });
+                            }
+
+                        
+                        reader1.Close();
                         return owner;
                     } else
                     {
