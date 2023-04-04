@@ -102,7 +102,6 @@ namespace DogGo.Repositories
                         };
                         reader.Close();
                         cmd.CommandText = @"SELECT Id, Name FROM Dog WHERE OwnerId = @id";
-                        //cmd.Parameters.AddWithValue("@id", id);
                         reader = cmd.ExecuteReader();
                             
                          while(reader.Read())
