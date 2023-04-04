@@ -101,21 +101,21 @@ namespace DogGo.Repositories
                             Doggo = new List<Doggo>()
                         };
                         reader.Close();
-                        cmd.CommandText = @"SELECT Id, Name FROM Dog WHERE OwnerId = @dId";
-                        cmd.Parameters.AddWithValue("@dId", id);
-                        SqlDataReader reader1 = cmd.ExecuteReader();
+                        cmd.CommandText = @"SELECT Id, Name FROM Dog WHERE OwnerId = @id";
+                        //cmd.Parameters.AddWithValue("@id", id);
+                        reader = cmd.ExecuteReader();
                             
-                         while(reader1.Read())
+                         while(reader.Read())
                             {
                                 owner.Doggo.Add(new Doggo()
                                 {
-                                    Id = reader1.GetInt32(reader1.GetOrdinal("Id")),
-                                    Name = reader1.GetString(reader1.GetOrdinal("Name"))
+                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                    Name = reader.GetString(reader.GetOrdinal("Name"))
                                 });
                             }
 
                         
-                        reader1.Close();
+                        reader.Close();
                         return owner;
                     } else
                     {
