@@ -42,7 +42,7 @@ namespace DogGo.Repositories
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
                             OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId")),
-                            Breed = reader.GetString(reader.GetOrdinal("Breed"))
+                            Breed = reader.GetString(reader.GetOrdinal("Breed")),
                         };
 
                         doggos.Add(doggo);
@@ -52,7 +52,40 @@ namespace DogGo.Repositories
                 }
             }
         }
+        public Doggo GetDoggoById(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                    SELECT Id, [Name], OwnerId, Breed
+                    FROM Dog
+                    WHERE Id = @id";
 
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    Doggo doggo = null;
+                    if(reader.Read())
+                    {
+                        doggo = new Doggo()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId")),
+                            Breed = reader.GetString(reader.GetOrdinal("Breed")),
+                            
+                        };
+                        
+                    }                     
+                    reader.Close();
+                    return doggo;
+                }
+            }
+        }
         public void AddDoggo(Doggo doggo)
         {
             using (SqlConnection conn = Connection)
@@ -69,7 +102,7 @@ namespace DogGo.Repositories
                     cmd.Parameters.AddWithValue("@name", doggo.Name);
                     cmd.Parameters.AddWithValue("@ownerId", doggo.OwnerId);
                     cmd.Parameters.AddWithValue("@breed", doggo.Breed);
-
+                    
                     int id = (int)cmd.ExecuteScalar();
 
                     doggo.Id = id;
@@ -90,12 +123,14 @@ namespace DogGo.Repositories
                         [Name] = @name,
                         OwnerId = @ownerId,
                         Breed = @breed,
+                        Notes = NULL,
+                        ImageUrl = NULL
                     WHERE Id = @id";
 
+                    cmd.Parameters.AddWithValue("@id", doggo.Id);
                     cmd.Parameters.AddWithValue("@name", doggo.Name);
                     cmd.Parameters.AddWithValue("@ownerId", doggo.OwnerId);
                     cmd.Parameters.AddWithValue("@breed", doggo.Breed);
-                    cmd.Parameters.AddWithValue("@id", doggo.Id);
 
                     cmd.ExecuteNonQuery();
                 }

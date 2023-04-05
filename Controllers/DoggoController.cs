@@ -25,7 +25,13 @@ namespace DogGo.Controllers
         // GET: DoggoController/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            Doggo doggo = _doggoRepo.GetDoggoById(id);
+
+            if(doggo == null)
+            {
+                return NotFound();
+            }
+            return View(doggo);
         }
 
         // GET: DoggoController/Create
@@ -37,57 +43,67 @@ namespace DogGo.Controllers
         // POST: DoggoController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Doggo doggo)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _doggoRepo.AddDoggo(doggo);
+                return RedirectToAction("Index");
             }
             catch
             {
-                return View();
+                return View(doggo);
             }
         }
 
         // GET: DoggoController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            Doggo doggo = _doggoRepo.GetDoggoById(id);
+            if(doggo == null)
+            {
+                return NotFound();
+            }
+            return View(doggo);
         }
 
         // POST: DoggoController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Doggo doggo)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _doggoRepo.UpdateDoggo(doggo);
+
+                return RedirectToAction("Index");
             }
-            catch
+            catch(Exception ex)
             {
-                return View();
+                return View(doggo);
             }
         }
 
         // GET: DoggoController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            Doggo doggo = _doggoRepo.GetDoggoById(id);
+            return View(doggo);
         }
 
         // POST: DoggoController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, Doggo doggo)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                _doggoRepo.DeleteDoggo(id);
+                return RedirectToAction("Index");
             }
             catch
             {
-                return View();
+                return View(doggo);
             }
         }
     }

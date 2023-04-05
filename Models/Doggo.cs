@@ -9,6 +9,6 @@
         public int OwnerId { get; set; }
 
         public string Breed { get; set; }
-
+        
     }
 }
