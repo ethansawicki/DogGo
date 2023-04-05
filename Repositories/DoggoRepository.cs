@@ -1,4 +1,5 @@
 ﻿using DogGo.Models;
+using DogGo.Utils;
 using Microsoft.Data.SqlClient;
 
 namespace DogGo.Repositories
@@ -61,7 +62,7 @@ namespace DogGo.Repositories
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                    SELECT Id, [Name], OwnerId, Breed
+                    SELECT Id, [Name], OwnerId, Breed, Notes, ImageUrl
                     FROM Dog
                     WHERE Id = @id";
 
@@ -77,9 +78,9 @@ namespace DogGo.Repositories
                             Name = reader.GetString(reader.GetOrdinal("Name")),
                             OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId")),
                             Breed = reader.GetString(reader.GetOrdinal("Breed")),
-                            
+                            Notes = DbUtils.GetString(reader, "Notes"),
+                            ImageUrl = DbUtils.GetString(reader, "ImageUrl")
                         };
-                        
                     }                     
                     reader.Close();
                     return doggo;
@@ -123,7 +124,7 @@ namespace DogGo.Repositories
                         [Name] = @name,
                         OwnerId = @ownerId,
                         Breed = @breed,
-                        Notes = NULL,
+                        Notes = @notes,
                         ImageUrl = NULL
                     WHERE Id = @id";
 
@@ -131,7 +132,7 @@ namespace DogGo.Repositories
                     cmd.Parameters.AddWithValue("@name", doggo.Name);
                     cmd.Parameters.AddWithValue("@ownerId", doggo.OwnerId);
                     cmd.Parameters.AddWithValue("@breed", doggo.Breed);
-
+                    cmd.Parameters.AddWithValue("@notes", doggo.Notes);
                     cmd.ExecuteNonQuery();
                 }
             }
