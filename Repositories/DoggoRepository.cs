@@ -156,5 +156,50 @@ namespace DogGo.Repositories
                 }
             }
         }
+        public List<Doggo> GetDoggosByOwnerId(int ownerId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT Id, Name, Breed, Notes, ImageUrl, OwnerId
+                        FROM Dog
+                        WHERE OwnerId = @ownerId";
+
+                    cmd.Parameters.AddWithValue("@ownerId", ownerId);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Doggo> dogs = new List<Doggo>();
+
+                    while (reader.Read())
+                    {
+                        Doggo doggo = new Doggo()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Breed = reader.GetString(reader.GetOrdinal("Breed")),
+                            OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId"))
+                        };
+
+                        if(reader.IsDBNull(reader.GetOrdinal("Notes")) == false)
+                        {
+                            doggo.Notes = reader.GetString(reader.GetOrdinal("Notes"));
+                        }
+                        if (reader.IsDBNull(reader.GetOrdinal("ImageUrl")) == false) 
+                        {
+                            doggo.ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl"));
+                        }
+
+                        dogs.Add(doggo);
+                    }
+                        reader.Close();
+                        return dogs;
+                }
+            }
+        }
     }
 }
