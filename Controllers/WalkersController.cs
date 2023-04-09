@@ -28,17 +28,17 @@ namespace DogGo.Controllers
         }
 
         // GET: WalkersController/Details/5
-        public ActionResult Details(int id, int ownerId)
+        public ActionResult Details(int id)
         {
-            Owner owner = _ownerRepo.GetOwnerById(ownerId);
+            
             Walker walker = _walkerRepo.GetWalkerById(id);
             List<Walk> walks = _walkRepo.GetWalksByWalkerId(id);
 
             ProfileViewModel vm = new ProfileViewModel()
             {
                 Walker = walker,
-                Walk = walks,
-                Owner = owner,
+                Walk = walks
+                
             };
             return View(vm);
         }
