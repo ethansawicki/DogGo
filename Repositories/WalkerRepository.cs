@@ -66,9 +66,11 @@ namespace DogGo.Repositories
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, [Name], ImageUrl, NeighborhoodId
-                        FROM Walker
-                        WHERE Id = @id
+                        SELECT w.Id as WalkerId, w.[Name] as WalkerName, w.ImageUrl, w.NeighborhoodId, n.Id as neighId, n.[Name] as neighName
+                        FROM Walker w
+                        JOIN Neighborhood n
+                        ON w.NeighborhoodId = n.Id
+                        WHERE w.Id = @id
                     ";
 
                     cmd.Parameters.AddWithValue("@id", id);
@@ -79,10 +81,14 @@ namespace DogGo.Repositories
                     {
                         Walker walker = new Walker
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Id = reader.GetInt32(reader.GetOrdinal("WalkerId")),
+                            Name = reader.GetString(reader.GetOrdinal("WalkerName")),
                             ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl")),
-                            
+                            Neighborhood = new Neighborhood()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("neighId")),
+                                Name = reader.GetString(reader.GetOrdinal("neighName"))
+                            }
                         };
 
                         reader.Close();
