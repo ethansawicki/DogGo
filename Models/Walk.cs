@@ -6,8 +6,10 @@
 
         public DateTime? Date { get; set; }
 
-        public int Duration { get; set; }
-
         public int DogId { get; set; }
+
+        public Owner Owner { get; set; }
+
+        public TimeSpan DurationTime { get; set; }
     }
 }
