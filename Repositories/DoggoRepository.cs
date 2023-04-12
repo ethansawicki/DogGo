@@ -98,12 +98,30 @@ namespace DogGo.Repositories
                     cmd.CommandText = @"
                     INSERT INTO Dog ([Name], OwnerId, Breed)
                     OUTPUT INSERTED.ID
-                    VALUES (@name, @ownerId, @breed)";
+                    VALUES (@name, @ownerId, @breed, @notes, @imageUrl)";
 
                     cmd.Parameters.AddWithValue("@name", doggo.Name);
                     cmd.Parameters.AddWithValue("@ownerId", doggo.OwnerId);
                     cmd.Parameters.AddWithValue("@breed", doggo.Breed);
                     
+                    if(doggo.Notes == null)
+                    {
+                        cmd.Parameters.AddWithValue("@notes", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@notes", doggo.Notes);
+                    }
+
+                    if(doggo.ImageUrl == null)
+                    {
+                        cmd.Parameters.AddWithValue("@imageUrl", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@imageUrl", doggo.ImageUrl);
+                    }
+
                     int id = (int)cmd.ExecuteScalar();
 
                     doggo.Id = id;

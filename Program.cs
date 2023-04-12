@@ -1,4 +1,5 @@
 using DogGo.Repositories;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,8 @@ builder.Services.AddTransient<IWalkerRepository, WalkerRepository>();
 builder.Services.AddTransient<IOwnerRepository, OwnerRepository>();
 builder.Services.AddTransient<IDoggoRepository, DoggoRepository>();
 builder.Services.AddTransient<INeighborhoodRepository, NeighborhoodRepository>();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options => options.LoginPath = "/Owners/LogIn");
 
 var app = builder.Build();
 
@@ -24,6 +27,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

@@ -1,9 +1,12 @@
 ﻿using DogGo.Models;
 using DogGo.Models.ViewModels;
 using DogGo.Repositories;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Dynamic;
+using System.Security.Claims;
 
 namespace DogGo.Controllers
 {
@@ -15,8 +18,8 @@ namespace DogGo.Controllers
         private readonly INeighborhoodRepository _neighborhoodRepo;
 
         public OwnerController(
-            IOwnerRepository ownerRepository, 
-            IDoggoRepository doggoRepo, 
+            IOwnerRepository ownerRepository,
+            IDoggoRepository doggoRepo,
             IWalkerRepository walkerRepo,
             INeighborhoodRepository neighborhoodRepo)
         {
@@ -24,6 +27,45 @@ namespace DogGo.Controllers
             _doggoRepo = doggoRepo;
             _walkerRepo = walkerRepo;
             _neighborhoodRepo = neighborhoodRepo;
+        }
+
+        // Login
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Login(LoginViewModel loginViewModel)
+        {
+            Owner owner = _ownerRepo.GetOwnerByEmail(loginViewModel.Email);
+
+            if(owner == null)
+            {
+                return Unauthorized();
+            }
+
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, owner.Id.ToString()),
+                new Claim(ClaimTypes.Email, owner.Email),
+                new Claim(ClaimTypes.Role, "DogOwner"),
+            };
+
+            ClaimsIdentity claimsIdentity = new ClaimsIdentity(
+                claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity));
+
+            return RedirectToAction("Index", "Doggo");
+        }
+
+        public async Task<ActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("Index", "Home");
         }
 
         // GET: OwnerController
