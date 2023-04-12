@@ -10,7 +10,6 @@ builder.Services.AddTransient<IOwnerRepository, OwnerRepository>();
 builder.Services.AddTransient<IDoggoRepository, DoggoRepository>();
 builder.Services.AddTransient<INeighborhoodRepository, NeighborhoodRepository>();
 builder.Services.AddTransient<IWalkRepository, WalkRepository>();
-
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options => options.LoginPath = "/Owners/LogIn");
 
